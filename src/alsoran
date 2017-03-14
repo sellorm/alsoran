@@ -1,0 +1,81 @@
+#!/usr/bin/env Rscript --vanilla
+#
+# alsoran
+#
+#
+
+# load/install the package dependencies!
+suppressMessages(if (!require("argparser")) {
+  install.packages("argparser")
+  require("argparser")
+})
+suppressMessages(if (!require("servr")) {
+  install.packages("servr")
+  require("servr")
+})
+
+
+# Initialise a new cran strucure on disk
+initialiseCran <- function(path){
+  localCRAN <- path.expand(path)
+  dir.create(localCRAN)
+  
+  contribDir <- file.path(localCRAN, "src", "contrib")
+  dir.create(contribDir, recursive = TRUE)
+  
+  rVersion <- paste(unlist(getRversion())[1:2], collapse = ".")
+  
+  binPaths <- list(
+    win.binary = file.path("bin/windows/contrib", rVersion),
+    mac.binary = file.path("bin/macosx/contrib", rVersion),
+    mac.binary.mavericks = file.path("bin/macosx/mavericks/contrib", rVersion),
+    mac.binary.leopard = file.path("bin/macosx/leopard/contrib", rVersion)
+  )
+  
+  binPaths <- lapply(binPaths, function(x) file.path(localCRAN, x))
+  lapply(binPaths, function(path) {
+    dir.create(path, recursive = TRUE)
+  })
+}
+  
+
+# update the PACKAGES files
+updateCran <- function(path){
+  # re-write PACKAGES
+  tools::write_PACKAGES(contribDir, type = "source")
+  lapply(binPaths, function(path) {
+    tools::write_PACKAGES(path)
+  })
+}
+
+# serve with servr::httd("/path/")
+serveDir <- function(path){
+  servr::httd(path)
+}
+
+
+# args
+p <- arg_parser("A tool to create your own R package repo like CRAN")
+# Add a positional argument
+p <- add_argument(p, "command", help="One of 'init', 'add', 'update', 'publish' or 'serve'")
+# optional args
+p <- add_argument(p, "--target", help="target directory or file", default = ".")
+# Add a flag
+# p <- add_argument(p, "--append", help="append to file", flag=TRUE)
+argv <- parse_args(p)
+
+
+# main - init, add, update, publish, serve
+if (argv$command == "init"){
+  initialiseCran(argv$target)
+} else if (argv$command == "add"){
+  TRUE
+} else if (argv$command == "update"){
+  updateCran(argv$target)
+} else if (argv$command == "publish"){
+  TRUE
+} else if (argv$command == "serve"){
+  serveDir(argv$target)
+} else {
+  print(p)
+}

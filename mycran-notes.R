@@ -1,4 +1,8 @@
-localCRAN <- path.expand("~/local-cran")
+# basically lifted the whole thing from here ->
+# https://rstudio.github.io/packrat/custom-repos.html
+
+# choose a directory and build out the structure
+localCRAN <- path.expand("./local-cran")
 dir.create(localCRAN)
 
 contribDir <- file.path(localCRAN, "src", "contrib")
@@ -19,13 +23,13 @@ lapply(binPaths, function(path) {
 })
 
 
-sashimiDescPath <- file.path(tempdir(), "sashimi", "DESCRIPTION")
-cat("Repository: sushi", file = sashimiDescPath, append = TRUE, sep = "\n")
+# sashimiDescPath <- file.path(tempdir(), "sashimi", "DESCRIPTION")
+# cat("Repository: sushi", file = sashimiDescPath, append = TRUE, sep = "\n")
 
 
 
 
-
+# re-write PACKAGES
 tools::write_PACKAGES(contribDir, type = "source")
 lapply(binPaths, function(path) {
   tools::write_PACKAGES(path)
