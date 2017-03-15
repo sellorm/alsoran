@@ -16,8 +16,8 @@ suppressMessages(if (!require("servr")) {
 
 
 # Initialise a new cran strucure on disk
-initialiseCran <- function(path){
-  localCRAN <- path.expand(path)
+initialiseCran <- function(cranpath){
+  localCRAN <- path.expand(cranpath)
   dir.create(localCRAN)
   
   contribDir <- file.path(localCRAN, "src", "contrib")
@@ -40,16 +40,16 @@ initialiseCran <- function(path){
   
 
 # update the PACKAGES files
-updateCran <- function(path){
+updateCran <- function(cranpath){
   # re-write PACKAGES
   tools::write_PACKAGES(contribDir, type = "source")
-  lapply(binPaths, function(path) {
-    tools::write_PACKAGES(path)
+  lapply(binPaths, function(cranpath) {
+    tools::write_PACKAGES(cranpath)
   })
 }
 
 # serve with servr::httd("/path/")
-serveDir <- function(path){
+serveDir <- function(cranpath){
   servr::httd(path)
 }
 
