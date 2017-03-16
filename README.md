@@ -4,6 +4,8 @@ Another tool to build an R Archive Network.
 
 Command line utility to build and maintain your own CRAN.
 
+[Click here for official packaged releases](https://github.com/sellorm/alsoran/releases)
+
 ## CRAN - The Comprehensive R Archive Network
 
 The real [CRAN](https://cran.r-project.org/) is amazing. Over 10 thousand additional packages for R published and available for free to the community.
