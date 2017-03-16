@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+# config
+VERSION=0.1
+ITERATION=1
+
+
+# Main stuff
+cd /build
+# set up functions
+
+# display help
+function help {
+    echo "Error: no option specified."
+    echo
+    echo "Usage: ${basename} <all|clean|help>"
+    echo
+    echo "    all     builds the packages"
+    echo "    clean   clean up downloaded pkg contents"
+    echo "    help    this help text"
+    exit 1
+}
+
+# clean up afterwards
+function clean {
+  rm -rf *.rpm
+  rm -rf *.deb
+  exit 0
+}
+
+# check input params
+case ${1} in
+  all)
+    ;;
+  clean)
+    clean
+    ;;
+  help|*)
+    help
+    ;;
+esac
+
+# check that fpm exists
+fpmExists=$(which fpm >/dev/null 2>&1 ; echo $?)
+if [[ ${fpmExists} -ne 0 ]];then
+    echo 'fpm is not installed, exiting.'
+    exit 1
+fi
+
+# build the rpm
+# rpm -qpRi --provides --scripts ./pm2-2.4.2-1.x86_64.rpm
+fpm -s dir -t rpm -C ./src/ \
+    --verbose \
+    --name alsoran \
+    --version ${VERSION} \
+    --iteration ${ITERATION} \
+    --vendor 'sellorm' \
+    --license 'MIT' \
+    --maintainer 'alsoran@5vcc.com' \
+    --url 'https://github.com/sellorm/alsoran' \
+    --description "Command line tool to manage a local CRAN" .
+
+
+
+# build the deb
+fpm -s dir -t deb -C ./src/ \
+    --verbose \
+    --name alsoran \
+    --version ${VERSION} \
+    --iteration ${ITERATION} \
+    --vendor 'sellorm' \
+    --license 'MIT' \
+    --maintainer 'alsoran@5vcc.com' \
+    --url 'https://github.com/sellorm/alsoran' \
+    --description "Command line tool to manage a local CRAN" .

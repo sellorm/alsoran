@@ -1,8 +1,13 @@
 #!/usr/bin/env Rscript --vanilla
 #
-# alsoran
+# alsoran - Another tool to build an R Archive Network.
+# Command line utility to build and maintain your own CRAN.
 #
+# basically lifted the whole thing from here ->
+# https://rstudio.github.io/packrat/custom-repos.html
 #
+
+alsoRanVersion <-  "0.1"
 
 # load/install the package dependencies!
 suppressMessages(if (!require("argparser")) {
@@ -14,68 +19,109 @@ suppressMessages(if (!require("servr")) {
   require("servr")
 })
 
+# define repo class
+repoDefinition <- setRefClass("repoDefinition",
+                       fields = list(
+                         repoRoot = "character",
+                         contribDir = "character",
+                         binPaths = "list"
+                         ),
+                       methods = list(
+                         populate = function(){
+                           rVersion <- paste(unlist(getRversion())[1:2], collapse = ".")
+                           contribDir <<- file.path(repoRoot, "src", "contrib")
+                           binPaths <<- list(
+                             win.binary = file.path(repoRoot, "bin/windows/contrib", rVersion),
+                             mac.binary = file.path(repoRoot, "bin/macosx/contrib", rVersion),
+                             mac.binary.mavericks = file.path(repoRoot, "bin/macosx/mavericks/contrib", rVersion),
+                             mac.binary.sierra = file.path(repoRoot, "bin/macosx/sierra/contrib", rVersion)
+                           )
+                         }
+                       )
+)
 
 # Initialise a new cran strucure on disk
-initialiseCran <- function(cranpath){
-  localCRAN <- path.expand(cranpath)
-  dir.create(localCRAN)
-  
-  contribDir <- file.path(localCRAN, "src", "contrib")
-  dir.create(contribDir, recursive = TRUE)
-  
-  rVersion <- paste(unlist(getRversion())[1:2], collapse = ".")
-  
-  binPaths <- list(
-    win.binary = file.path("bin/windows/contrib", rVersion),
-    mac.binary = file.path("bin/macosx/contrib", rVersion),
-    mac.binary.mavericks = file.path("bin/macosx/mavericks/contrib", rVersion),
-    mac.binary.leopard = file.path("bin/macosx/leopard/contrib", rVersion)
-  )
-  
-  binPaths <- lapply(binPaths, function(x) file.path(localCRAN, x))
-  lapply(binPaths, function(path) {
+initialiseCran <- function(repoDef){
+  dir.create(repoDef$contribDir, recursive = TRUE)
+  lapply(repoDef$binPaths, function(path) {
     dir.create(path, recursive = TRUE)
   })
+  indexPage <- '
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>alsoRAN</title>
+  <style>
+    body {
+      font-family: Sans-serif;
+    }
+    .container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-80%);
+      margin: 0;
+    }
+  </style>
+  </head>
+  <body>
+    <div class=container>
+      <h1>alsoRAN Repo</h1>
+      <div style="text-align: right;">Built with <a href="https://github.com/sellorm/alsoran">alsoRAN</a></div>
+    </div>
+  </body>
+<html>
+'
+  cat(indexPage, file = file.path(repoDef$repoRoot, "index.html"))
 }
   
 
 # update the PACKAGES files
-updateCran <- function(cranpath){
-  # re-write PACKAGES
-  tools::write_PACKAGES(contribDir, type = "source")
-  lapply(binPaths, function(cranpath) {
+updateCran <- function(repoDef){
+  tools::write_PACKAGES(repoDef$contribDir, type = "source")
+  lapply(repoDef$binPaths, function(cranpath) {
     tools::write_PACKAGES(cranpath)
   })
 }
 
 # serve with servr::httd("/path/")
-serveDir <- function(cranpath){
-  servr::httd(path)
+serveDir <- function(repoDef){
+  servr::httd(repoDef$repoRoot)
+}
+
+# publish CRAN repo
+publishCran <- function(){
+  cat('TODO - Sorry :)\n')
 }
 
 
 # args
 p <- arg_parser("A tool to create your own R package repo like CRAN")
-# Add a positional argument
-p <- add_argument(p, "command", help="One of 'init', 'add', 'update', 'publish' or 'serve'")
-# optional args
-p <- add_argument(p, "--target", help="target directory or file", default = ".")
-# Add a flag
-# p <- add_argument(p, "--append", help="append to file", flag=TRUE)
+p <- add_argument(p, "command", help="One of 'init', 'add', 'update', 'serve' or 'version'")
+p <- add_argument(p, "--repo", help="CRAN repo directory path", default = ".")
+p <- add_argument(p, "--file", help="CRAN repo directory path")
 argv <- parse_args(p)
 
+# build the repo obbject
+##
+aranRepo <- repoDefinition$new(repoRoot = path.expand(argv$repo))
+aranRepo$populate()
 
 # main - init, add, update, publish, serve
 if (argv$command == "init"){
-  initialiseCran(argv$target)
+  initialiseCran(aranRepo)
 } else if (argv$command == "add"){
-  TRUE
+  file.copy(path.expand(argv$file), file.path(path.expand(argv$repo), "src", "contrib"))
+  updateCran(aranRepo)
 } else if (argv$command == "update"){
-  updateCran(argv$target)
+  updateCran(aranRepo)
 } else if (argv$command == "publish"){
-  TRUE
+  publishCran()
 } else if (argv$command == "serve"){
-  serveDir(argv$target)
+  serveDir(aranRepo)
+} else if (argv$command == "version"){
+  cat(alsoRanVersion, "\n")
+  q("no")
 } else {
   print(p)
 }
