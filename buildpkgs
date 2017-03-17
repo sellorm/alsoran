@@ -5,14 +5,16 @@ ITERATION=1
 
 
 # Main stuff
-cd /build
+cd /build || exit 1
+
+
 # set up functions
 
 # display help
 function help {
     echo "Error: no option specified."
     echo
-    echo "Usage: ${basename} <all|clean|help>"
+    echo "Usage: $(basename) <all|clean|help>"
     echo
     echo "    all     builds the packages"
     echo "    clean   clean up downloaded pkg contents"
@@ -22,8 +24,8 @@ function help {
 
 # clean up afterwards
 function clean {
-  rm -rf *.rpm
-  rm -rf *.deb
+  rm -rf ./*.rpm
+  rm -rf ./*.deb
   exit 0
 }
 
