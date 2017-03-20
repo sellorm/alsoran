@@ -121,3 +121,11 @@ while true
 ```
 
 There are monitoring and daemonisation flags for `inotifywait` ('-m' and '-d' respectively) but they just print messages out to the console and don't trigger an action.
+
+## Building RPM and deb packages
+
+Run the following to build with docker:
+
+```
+build docker all
+```
