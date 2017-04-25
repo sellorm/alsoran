@@ -19,6 +19,8 @@ function help {
     echo "    all     builds the packages"
     echo "    clean   clean up downloaded pkg contents"
     echo "    help    this help text"
+    echo ""
+    echo "To build using a docker container use '$(basename ${0}) docker <all|clean|help>'"
     exit 1
 }
 
