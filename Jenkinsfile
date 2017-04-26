@@ -9,7 +9,8 @@ pipeline {
         }
         stage('Archive') {
             steps {
-                archiveArtifacts artifacts: '*.rpm'
+                archiveArtifacts artifacts: '*.rpm', fingerprint: true
+                archiveArtifacts artifacts: '*.deb', fingerprint: true
             }
         }
     }
