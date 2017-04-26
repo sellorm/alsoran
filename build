@@ -77,7 +77,7 @@ function dockerBuild {
   shift 1
   BUILDOPTS="${@}"
   # docker run
-  docker run -ti -v ${PWD}:/build --entrypoint "/build/build" sellorm/build ${BUILDOPTS}
+  docker run -i -v ${PWD}:/build --entrypoint "/build/build" sellorm/build ${BUILDOPTS}
 }
 
 # check input params
