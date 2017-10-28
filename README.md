@@ -69,7 +69,7 @@ Alternatively, you can copy the source packages in by hand and then call the fol
 alsoran update -r /path/to/repo
 ```
 
-alsoRAN aso features a built in server for serving the repo over the network.
+alsoRAN also features a built in server for serving the repo over the network.
 
 This can be started using:
 
