@@ -20,7 +20,7 @@ Chances are you don't need access to all 10 thousand packages available on CRAN.
 
 ## Why isn't it an R Package? And what about things like drat and miniCRAN?
 
-R packages are for R users and many people charged with the ongoing maintenance of these types of systems are **not** R users. The system administrator should not need to know anything about running R in order to maintain a CRAN-like repository. `alsoran` therefore provides a familiar command line interface in order to fit more comfortably into the sys-admin/DevOps ecosystem.
+R packages, like drat and miniCRAN, are for R users and many people charged with the ongoing maintenance of these types of systems are **not** R users. The system administrator should not need to know anything about running R in order to maintain a CRAN-like repository. `alsoran` therefore provides a familiar command line interface in order to fit more comfortably into the sys-admin/DevOps ecosystem.
 
 ## Usage
 
