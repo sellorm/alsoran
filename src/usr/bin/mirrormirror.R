@@ -1,7 +1,10 @@
 #!/usr/bin/env Rscript --vanilla --no-save
 
 # set root cran repo name
-cran_mirror <- "https://cran.microsoft.com/snapshot/2017-10-15/"
+cran_mirror <- "https://cran.microsoft.com/snapshot/2017-11-24/"
+
+#get all the available package names from this mirror
+pkgs_available <- available.packages(repos=cran_mirror)[,"Package"]
 
 # Check the dl directory
 if (!dir.exists("./dl/src")){
@@ -29,14 +32,14 @@ pkgs_to_download <- setdiff(pkgs_unique, pkgs_base)
 
 # Check what will be downloaded
 pkgs_to_download
-setNames(object = pkgs_to_download, pkgs_to_download)
 
 # check against the available packages from the server
-pkgs_available <- available.packages(repos=cran_mirror)[,"Package"]
 pkg_check_result <- pkgs_to_download %in% pkgs_available
-setNames(pkg_check_result, pkgs_to_download)
+pkg_check_result <- setNames(pkg_check_result, pkgs_to_download)
 if ( FALSE %in% pkg_check_result){
   cat("Error in package name\n")
+  pkg_errors <- which(pkg_check_result==FALSE)
+  cat(names(pkg_errors),"\n")
   if (interactive()){
     stop("Problem with package name")
   } else {}
